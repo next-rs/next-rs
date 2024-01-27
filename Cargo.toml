@@ -1,7 +1,15 @@
 [package]
 name = "next-rs"
 version = "0.0.1"
+description = "WIP: UI in Rust made simple."
+license = "MIT"
+keywords = ["next", "yew", "rust", "next-rs"]
+repository = "https://github.com/next-rs/next-rs"
+documentation = "https://docs.rs/next-rs"
+homepage = "https://next-rs.dev"
+authors = ["Mahmoud Harmouch <oss@wiseai.dev>"]
 edition = "2021"
+exclude = ["/examples"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,3 +18,9 @@ stylist = { version = "0.13.0", features = ["yew_integration"] }
 web-sys = { version = "0.3.67", features = ["ScrollToOptions", "ScrollBehavior"] }
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = "thin"
+strip = "symbols"
