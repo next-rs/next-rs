@@ -1,7 +1,7 @@
-use web_sys::window;
-use web_sys::{ScrollBehavior, ScrollToOptions};
 use crate::prelude::*;
 use crate::router::*;
+use web_sys::window;
+use web_sys::{ScrollBehavior, ScrollToOptions};
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]

@@ -14,9 +14,13 @@ exclude = ["/examples"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+gloo-net = { version = "0.5.0", features = ["http"] }
+serde_json = "1.0.112"
 stylist = { version = "0.13.0", features = ["yew_integration"] }
-web-sys = { version = "0.3.67", features = ["ScrollToOptions", "ScrollBehavior"] }
+wasm-bindgen-futures = "0.4.40"
+web-sys = { version = "0.3.67", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior"] }
 yew = { version = "0.21.0", features = ["csr"] }
+yew-navbar = "0.1.0"
 yew-router = "0.18.0"
 
 [profile.release]
