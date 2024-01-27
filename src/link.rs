@@ -1,7 +1,7 @@
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
-use yew::prelude::*;
-use yew_router::prelude::*;
+use crate::prelude::*;
+use crate::router::*;
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
