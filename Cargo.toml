@@ -1,0 +1,12 @@
+[package]
+name = "next-rs"
+version = "0.0.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+stylist = { version = "0.13.0", features = ["yew_integration"] }
+web-sys = { version = "0.3.67", features = ["ScrollToOptions", "ScrollBehavior"] }
+yew = { version = "0.21.0", features = ["csr"] }
+yew-router = "0.18.0"
