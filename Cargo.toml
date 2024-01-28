@@ -20,11 +20,14 @@ serde_json = "1.0.112"
 stylist = { version = "0.13.0", features = ["yew_integration"] }
 wasm-bindgen-futures = "0.4.40"
 web-sys = { version = "0.3.67", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior"] }
-yew = { version = "0.21.0", features = ["csr"] }
+yew = { version = "0.21.0", features = ["csr"], isolated = true }
 yew-i18n = "0.1.1"
 yew-navbar = "0.1.0"
 yew-router = "0.18.0"
 yew-sidebar = "0.1.0"
+
+[package.metadata.docs.rs]
+all-features = true
 
 [profile.release]
 codegen-units = 1
