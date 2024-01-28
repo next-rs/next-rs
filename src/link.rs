@@ -1,13 +1,25 @@
 use crate::prelude::*;
-use crate::router::*;
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
-pub struct LinkProps<R: Routable + PartialEq> {
+pub struct LinkProps {
     /// The target URL for the link.
-    pub href: R,
+    #[prop_or_default]
+    pub to: &'static str,
+
+    /// The CSS class for styling the link.
+    #[prop_or_default]
+    pub class: &'static str,
+
+    /// The target attribute for the link.
+    #[prop_or("_blank")]
+    pub target: &'static str,
+
+    /// The "rel" attribute for the link.
+    #[prop_or("noreferrer")]
+    pub rel: &'static str,
 
     /// The content to be displayed within the link.
     #[prop_or_default]
@@ -24,10 +36,6 @@ pub struct LinkProps<R: Routable + PartialEq> {
     /// Scroll behavior when clicking the link. Valid values: "auto", "instant", "smooth".
     #[prop_or("auto")]
     pub scroll_behavior: &'static str,
-
-    /// Callback function for handling errors, typically invoked when navigating to the link fails.
-    #[prop_or_default]
-    pub on_error: Callback<String>,
 
     /// Indicates the current state of the link in a navigation menu. Valid values: "page", "step", "location", "date", "time", "true", "false".
     #[prop_or_default]
@@ -73,7 +81,6 @@ pub struct LinkProps<R: Routable + PartialEq> {
 /// # Examples
 /// ```
 /// // Example of using the Link component
-/// use crate::router::Route; // Your `Route` enum
 /// use next_rs::{Link, LinkProps};
 /// use next_rs::prelude::*;
 ///
@@ -81,34 +88,22 @@ pub struct LinkProps<R: Routable + PartialEq> {
 /// pub fn my_component() -> Html {
 ///
 ///     html! {
-///         <Link<Route>
+///         <Link
 ///             scroll_offset=300.0
 ///             scroll_behavior="smooth"
-///             href={Route::LandingPage}
+///             to={"#about"}
 ///             scroll=true
-///             on_error={Callback::from(|err| {
-///                 println!("Navigation error: {:?}", err);
-///             })}
-///         >{ "Go Home" }</Link<Route>>
+///         >{ "Go Home" }</Link>
 ///     }
 /// }
 /// ```
 #[function_component(Link)]
-pub fn link<R: PartialEq + Routable + 'static>(props: &LinkProps<R>) -> Html {
-    let navigator = use_navigator().unwrap();
-
-    let on_error_callback = props.on_error.clone();
+pub fn link(props: &LinkProps) -> Html {
     let props = props.clone();
 
     let onclick_callback = {
         let props = props.clone();
         Callback::from(move |_| {
-            match navigator.push(&props.href) {
-                () => {
-                    on_error_callback.emit("error occurred!".to_string());
-                }
-            };
-
             if props.scroll {
                 let scroll_behavior = match props.scroll_behavior {
                     "auto" => ScrollBehavior::Auto,
@@ -132,13 +127,16 @@ pub fn link<R: PartialEq + Routable + 'static>(props: &LinkProps<R>) -> Html {
         })
     };
 
-    let aria_label = "Link to ".to_string() + &props.href.to_path();
+    let aria_label = "Link to ".to_string() + &props.to;
 
     let tabindex = if props.scroll { "0" } else { "-1" };
 
     html! {
         <a
-            href={props.href.clone().to_path()}
+            href={props.to}
+            target={props.target}
+            rel={props.rel}
+            class={props.class}
             onclick={onclick_callback}
             role="link"
             tabindex={tabindex}
