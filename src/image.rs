@@ -1,7 +1,7 @@
+use crate::prelude::*;
 use gloo_net::http::Request;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::RequestCache;
-use crate::prelude::*;
 
 /// Properties for the Image component.
 #[derive(Properties, Clone, PartialEq)]
