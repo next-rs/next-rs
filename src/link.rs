@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
+use yew::html;
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
@@ -87,7 +88,7 @@ pub struct LinkProps {
 /// #[function_component(MyComponent)]
 /// pub fn my_component() -> Html {
 ///
-///     html! {
+///     rsx! {
 ///         <Link
 ///             scroll_offset=300.0
 ///             scroll_behavior="smooth"
