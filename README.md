@@ -7,7 +7,7 @@
 
 ## 📜 Introduction
 
-Next RS is a UI framework written 100% Rust that simplifies building user interfaces. It provides a collection of optional features, each designed to enhance different aspects of UI development. Explore the documentation to learn about the features and how to integrate them into your Next RS projects.
+Next RS is a UI framework, written 100% in Rust btw, that simplifies building user interfaces. It provides a collection of optional features, each designed to enhance different aspects of UI development. Explore the documentation to learn about the features and how to integrate them into your Next RS projects.
 
 ## 🚀 Features
 
