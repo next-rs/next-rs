@@ -45,7 +45,7 @@
 //!
 //! Then, in your Rust code:
 //!
-//! ```rust
+//! ```rust,no_run
 //! use next_rs::prelude::*;
 //! use next_rs::Navbar;
 //!
