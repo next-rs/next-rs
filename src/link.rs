@@ -1,7 +1,6 @@
 use crate::prelude::*;
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
-use yew::html;
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
@@ -85,7 +84,7 @@ pub struct LinkProps {
 /// use next_rs::{Link, LinkProps};
 /// use next_rs::prelude::*;
 ///
-/// #[function_component(MyComponent)]
+/// #[func]
 /// pub fn my_component() -> Html {
 ///
 ///     rsx! {
@@ -102,17 +101,61 @@ pub struct LinkProps {
 pub fn link(props: &LinkProps) -> Html {
     let props = props.clone();
 
-    let onclick_callback = {
-        let props = props.clone();
-        Callback::from(move |_| {
-            if props.scroll {
-                let scroll_behavior = match props.scroll_behavior {
-                    "auto" => ScrollBehavior::Auto,
-                    "instant" => ScrollBehavior::Instant,
-                    "smooth" => ScrollBehavior::Smooth,
-                    &_ => ScrollBehavior::Auto,
-                };
+    let (target, href) = if props.to.starts_with("/#") {
+        // local anchor
+        ("_self", &props.to[1..])
+    } else if props.to.starts_with('#') {
+        // also local anchor
+        ("_self", props.to)
+    } else {
+        // external
+        (props.target, props.to)
+    };
+    let onclick = Callback::from(move |event: MouseEvent| {
+        if props.scroll {
+            let scroll_behavior = match props.scroll_behavior {
+                "auto" => ScrollBehavior::Auto,
+                "instant" => ScrollBehavior::Instant,
+                "smooth" => ScrollBehavior::Smooth,
+                _ => ScrollBehavior::Auto,
+            };
 
+            if props.to.starts_with('#') || props.to.starts_with("/#") {
+                // Prevent default navigation behavior("instant")
+                event.prevent_default();
+                // Local anchor link
+                if let Some(element) = window()
+                    .and_then(|win| win.document())
+                    .and_then(|doc| doc.get_element_by_id(&href[1..]))
+                {
+                    let offset_top = element.get_bounding_client_rect().y();
+                    window()
+                        .and_then(|win| {
+                            Some(
+                                win.scroll_to_with_scroll_to_options(
+                                    &ScrollToOptions::new()
+                                        .top(offset_top)
+                                        .behavior(scroll_behavior),
+                                ),
+                            )
+                        })
+                        .expect("Failed to scroll to local anchor link");
+                } else {
+                    // Fallback to prop offset if element is not found
+                    window()
+                        .and_then(|win| {
+                            Some(
+                                win.scroll_to_with_scroll_to_options(
+                                    &ScrollToOptions::new()
+                                        .top(props.scroll_offset)
+                                        .behavior(scroll_behavior),
+                                ),
+                            )
+                        })
+                        .expect("Failed to scroll to fallback offset");
+                }
+            } else {
+                // External link
                 window()
                     .and_then(|win| {
                         Some(
@@ -123,22 +166,21 @@ pub fn link(props: &LinkProps) -> Html {
                             ),
                         )
                     })
-                    .expect("Failed to scroll");
+                    .expect("Failed to scroll to external link");
             }
-        })
-    };
-
-    let aria_label = "Link to ".to_string() + &props.to;
+        }
+    });
+    let aria_label = "Link to ".to_string() + &href;
 
     let tabindex = if props.scroll { "0" } else { "-1" };
 
-    html! {
+    rsx! {
         <a
-            href={props.to}
-            target={props.target}
+            href={href}
+            target={target}
             rel={props.rel}
             class={props.class}
-            onclick={onclick_callback}
+            onclick={onclick}
             role="link"
             tabindex={tabindex}
             aria-label={aria_label.clone()}
