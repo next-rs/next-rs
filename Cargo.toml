@@ -1,6 +1,6 @@
 [package]
 name = "next-rs"
-version = "0.0.7"
+version = "0.0.8"
 description = "📈 UI in Rust made simple."
 license = "MIT"
 keywords = ["next", "yew", "rust", "next-rs"]

@@ -31,14 +31,14 @@ Integrating Next RS into your project is straightforward. Add it as a dependency
 
 ```toml
 [dependencies]
-next-rs = "0.0.7"
+next-rs = "0.0.8"
 ```
 
 Additionally, Next RS provides a flexible configuration through feature flags. Modify the `Cargo.toml` file to enable or disable specific features.
 
 ```toml
 [dependencies]
-next-rs = { version = "0.0.7", features = ["navbar", "sidebar", "accordion", "alert", "css"] }
+next-rs = { version = "0.0.8", features = ["navbar", "sidebar", "accordion", "alert", "css"] }
 ```
 
 ## 📙 Examples
