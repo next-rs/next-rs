@@ -1,6 +1,6 @@
 [package]
 name = "next-rs"
-version = "0.0.6"
+version = "0.0.7"
 description = "📈 UI in Rust made simple."
 license = "MIT"
 keywords = ["next", "yew", "rust", "next-rs"]
@@ -18,7 +18,7 @@ categories = ["web-programming", "no-std"]
 gloo-net = { version = "0.5.0", features = ["http"] }
 serde_json = "1.0.112"
 wasm-bindgen-futures = "0.4.40"
-web-sys = { version = "0.3.67", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior"] }
+web-sys = { version = "0.3.67", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior", "DomRect", "Element"] }
 yew = { version = "0.21.0", default-features = false, optional = true }
 yew-i18n = { version = "0.1.2", default-features = false, optional = true }
 yew-navbar = { version = "0.1.1", default-features = false, optional = true }
