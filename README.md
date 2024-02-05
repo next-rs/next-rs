@@ -31,15 +31,23 @@ Integrating Next RS into your project is straightforward. Add it as a dependency
 
 ```toml
 [dependencies]
-next-rs = "0.0.6"
+next-rs = "0.0.7"
 ```
 
 Additionally, Next RS provides a flexible configuration through feature flags. Modify the `Cargo.toml` file to enable or disable specific features.
 
 ```toml
 [dependencies]
-next-rs = { version = "0.0.6", features = ["navbar", "sidebar", "accordion", "alert", "css"] }
+next-rs = { version = "0.0.7", features = ["navbar", "sidebar", "accordion", "alert", "css"] }
 ```
+
+## 📙 Examples
+
+If you want to explore different Next RS components and features, you can check out the [examples folder](examples) for more information.
+
+| Example | URL |
+| --- | --- |
+| Link Component | [![Netlify Status](https://api.netlify.com/api/v1/badges/0f5cbba1-4179-45c7-91e2-5540f3539a12/deploy-status)](https://next-rs-link.netlify.app) |
 
 ## 🤝 Contribution
 
