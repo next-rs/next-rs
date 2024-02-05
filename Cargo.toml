@@ -31,7 +31,7 @@ stylist  = { version = "0.13.0", features = ["yew_integration"], optional = true
 
 [features]
 default = ["yew-router", "yew/csr"]
-csr = ["yew/csr"]
+# csr = ["yew/csr"]
 navbar = ["yew-navbar"]
 sidebar = ["yew-sidebar"]
 alert = ["yew-alert"]
