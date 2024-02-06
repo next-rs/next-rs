@@ -20,6 +20,6 @@
 	trunk serve --port 3000
 	```
 1. Uncomment this line:
-    TODO
+    https://github.com/next-rs/next-rs/blob/b648172b5e296a4a4d204251080a741690c9c3fb/examples/images/index.html#L5
 
 Navigate to http://localhost:3000 to explore the landing page.
