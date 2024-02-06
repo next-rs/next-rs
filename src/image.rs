@@ -7,15 +7,19 @@ use web_sys::RequestCache;
 #[derive(Properties, Clone, PartialEq)]
 pub struct ImageProps {
     /// The source URL for the image.
+    #[prop_or_default]
     pub src: &'static str,
 
     /// The alternative text for the image.
+    #[prop_or_default]
     pub alt: &'static str,
 
     /// The width of the image.
+    #[prop_or_default]
     pub width: &'static str,
 
     /// The height of the image.
+    #[prop_or_default]
     pub height: &'static str,
 
     // Common props
@@ -76,10 +80,75 @@ pub struct ImageProps {
     /// Indicates if the image should be unoptimized.
     pub unoptimized: bool,
 
-    // Other Props
     #[prop_or_default]
     /// Reference to the DOM node.
     pub node_ref: NodeRef,
+
+    #[prop_or_default]
+    /// Indicates the current state of the image in a navigation menu. Valid values: "page", "step", "location", "date", "time", "true", "false".
+    pub aria_current: &'static str,
+
+    #[prop_or_default]
+    /// Describes the image using the ID of the element that provides a description.
+    pub aria_describedby: &'static str,
+
+    #[prop_or_default]
+    /// Indicates whether the content associated with the image is currently expanded or collapsed. Valid values: "true", "false".
+    pub aria_expanded: &'static str,
+
+    #[prop_or_default]
+    /// Indicates whether the image is currently hidden from the user. Valid values: "true", "false".
+    pub aria_hidden: &'static str,
+
+    #[prop_or_default]
+    /// Indicates whether the content associated with the image is live and dynamic. Valid values: "off", "assertive", "polite".
+    pub aria_live: &'static str,
+
+    #[prop_or_default]
+    /// Indicates whether the image is currently pressed or selected. Valid values: "true", "false", "mixed", "undefined".
+    pub aria_pressed: &'static str,
+
+    #[prop_or_default]
+    /// ID of the element that the image controls or owns.
+    pub aria_controls: &'static str,
+
+    #[prop_or_default]
+    /// ID of the element that labels the image.
+    pub aria_labelledby: &'static str,
+}
+
+impl Default for ImageProps {
+    fn default() -> Self {
+        ImageProps {
+            src: "",
+            alt: "Image",
+            width: "300",
+            height: "200",
+            style: "",
+            class: "",
+            sizes: "",
+            quality: "",
+            priority: false,
+            placeholder: "blur",
+            on_loading_complete: Callback::noop(),
+            object_fit: "cover",
+            object_position: "center",
+            on_error: Callback::noop(),
+            decoding: "",
+            blur_data_url: "",
+            lazy_boundary: "100px",
+            unoptimized: false,
+            node_ref: NodeRef::default(),
+            aria_current: "",
+            aria_describedby: "",
+            aria_expanded: "",
+            aria_hidden: "",
+            aria_live: "",
+            aria_pressed: "",
+            aria_controls: "",
+            aria_labelledby: "",
+        }
+    }
 }
 
 /// The Image component for displaying images with various options.
@@ -92,12 +161,11 @@ pub struct ImageProps {
 ///
 /// # Examples
 /// ```
-/// // Example of using the Image component
-/// use next_rs::{Image, ImageProps};
 /// use next_rs::prelude::*;
+/// use next_rs::{Image, ImageProps, log};
 ///
-/// #[function_component(MyComponent)]
-/// pub fn my_component() -> Html {
+/// #[func]
+/// pub fn MyComponent() -> Html {
 ///     let image_props = ImageProps {
 ///         src: "images/logo.png",
 ///         alt: "Example Image",
@@ -110,12 +178,12 @@ pub struct ImageProps {
 ///         priority: true,
 ///         placeholder: "blur",
 ///         on_loading_complete: Callback::from(|_| {
-///             println!("Image loading is complete!");
+///             log(&format!("Image loading is complete!").into());
 ///         }),
 ///         object_fit: "cover",
 ///         object_position: "center",
 ///         on_error: Callback::from(|err| {
-///             println!("Error loading image: {:?}", err);
+///             log(&format!("Error loading image 1: {:#?}", err).into());
 ///         }),
 ///         decoding: "async",
 ///         blur_data_url: "data:image/png;base64,....",
@@ -129,17 +197,16 @@ pub struct ImageProps {
 ///     }
 /// }
 /// ```
-#[function_component(Image)]
-pub fn image(props: &ImageProps) -> Html {
+#[func]
+pub fn Image(props: &ImageProps) -> Html {
     let props = props.clone();
 
     let fetch_data = {
         Callback::from(move |_| {
-            let loader_url = props.src;
             let loading_complete_callback = props.on_loading_complete.clone();
             let on_error_callback = props.on_error.clone();
             spawn_local(async move {
-                match Request::get(&loader_url)
+                match Request::get(&props.src)
                     .cache(RequestCache::Reload)
                     .send()
                     .await
@@ -150,15 +217,13 @@ pub fn image(props: &ImageProps) -> Html {
                             Ok(_data) => {
                                 loading_complete_callback.emit(());
                             }
-                            Err(_err) => {
-                                let event = Event::new("error").unwrap();
-                                on_error_callback.emit(event.to_string().into());
+                            Err(err) => {
+                                on_error_callback.emit(err.to_string().into());
                             }
                         }
                     }
-                    Err(_err) => {
-                        let event = Event::new("error").unwrap();
-                        on_error_callback.emit(event.to_string().into());
+                    Err(err) => {
+                        on_error_callback.emit(err.to_string().into());
                     }
                 }
             });
@@ -182,6 +247,16 @@ pub fn image(props: &ImageProps) -> Html {
             onerror={fetch_data.clone()}
             decoding={props.decoding}
             ref={props.node_ref}
+            role="img"
+            aria-label={props.alt}
+            aria-labelledby={props.aria_labelledby}
+            aria-describedby={props.aria_describedby}
+            aria-hidden={props.aria_hidden}
+            aria-current={props.aria_current}
+            aria-expanded={props.aria_expanded}
+            aria-live={props.aria_live}
+            aria-pressed={props.aria_pressed}
+            aria-controls={props.aria_controls}
         />
     }
 }
