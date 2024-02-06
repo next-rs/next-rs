@@ -80,12 +80,11 @@ pub struct LinkProps {
 ///
 /// # Examples
 /// ```
-/// // Example of using the Link component
-/// use next_rs::{Link, LinkProps};
 /// use next_rs::prelude::*;
+/// use next_rs::Link;
 ///
 /// #[func]
-/// pub fn my_component() -> Html {
+/// pub fn MyComponent() -> Html {
 ///
 ///     rsx! {
 ///         <Link
@@ -97,8 +96,8 @@ pub struct LinkProps {
 ///     }
 /// }
 /// ```
-#[function_component(Link)]
-pub fn link(props: &LinkProps) -> Html {
+#[func]
+pub fn Link(props: &LinkProps) -> Html {
     let props = props.clone();
 
     let (target, href) = if props.to.starts_with("/#") {
