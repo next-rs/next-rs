@@ -78,13 +78,13 @@
 pub mod image;
 pub mod link;
 
-pub use link::{Link, LinkProps};
-
 pub use image::{Image, ImageProps};
 #[cfg(feature = "input")]
 pub use input_yew::CustomInput as Input;
+pub use link::{Link, LinkProps};
 #[cfg(feature = "css")]
 pub use stylist::yew::styled_component;
+pub use web_sys::console::log_1 as log;
 pub use yew::Renderer;
 #[cfg(feature = "accordion")]
 pub use yew_accordion::{Accordion, AccordionButton, AccordionItem};
