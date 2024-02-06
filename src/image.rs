@@ -190,6 +190,7 @@ impl Default for ImageProps {
 ///         lazy_boundary: "200px",
 ///         unoptimized: false,
 ///         node_ref: NodeRef::default(),
+///         ..ImageProps::default()
 ///     };
 ///
 ///     rsx! {
