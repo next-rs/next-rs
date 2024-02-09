@@ -207,7 +207,7 @@ pub fn Image(props: &ImageProps) -> Html {
             let loading_complete_callback = props.on_loading_complete.clone();
             let on_error_callback = props.on_error.clone();
             spawn_local(async move {
-                match Request::get(&props.src)
+                match Request::get(props.src)
                     .cache(RequestCache::Reload)
                     .send()
                     .await
@@ -219,12 +219,12 @@ pub fn Image(props: &ImageProps) -> Html {
                                 loading_complete_callback.emit(());
                             }
                             Err(err) => {
-                                on_error_callback.emit(err.to_string().into());
+                                on_error_callback.emit(err.to_string());
                             }
                         }
                     }
                     Err(err) => {
-                        on_error_callback.emit(err.to_string().into());
+                        on_error_callback.emit(err.to_string());
                     }
                 }
             });

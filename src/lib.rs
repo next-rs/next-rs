@@ -77,11 +77,13 @@
 
 pub mod image;
 pub mod link;
+pub mod router;
 
 pub use image::{Image, ImageProps};
 #[cfg(feature = "input")]
 pub use input_yew::CustomInput as Input;
 pub use link::{Link, LinkProps};
+pub use router::*;
 #[cfg(feature = "css")]
 pub use stylist::yew::styled_component;
 pub use web_sys::console::log_1 as log;
@@ -94,7 +96,7 @@ pub use yew_alert::{Alert, AlertProps};
 pub use yew_i18n::{use_translation, I18nProvider, YewI18n};
 #[cfg(feature = "navbar")]
 pub use yew_navbar::{Menu, Navbar, NavbarProps};
-pub use yew_router::prelude as router;
+pub use yew_router::history;
 #[cfg(feature = "sidebar")]
 pub use yew_sidebar::{MenuItem, Sidebar, SidebarProps};
 
