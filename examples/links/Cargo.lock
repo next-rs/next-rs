@@ -698,7 +698,6 @@ dependencies = [
  "next-rs",
  "serde_json",
  "yew",
- "yew-router",
 ]
 
 [[package]]

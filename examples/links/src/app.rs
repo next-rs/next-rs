@@ -1,13 +1,19 @@
+use crate::pages::landing::LandingPage;
 use next_rs::prelude::*;
 use next_rs::router::*;
 
-use crate::router::{switch, Route};
+pub fn switch(route: String) -> Html {
+    match route.as_str() {
+        "/" => rsx! {<LandingPage />},
+        _ => rsx! {<></>},
+    }
+}
 
 #[func]
 pub fn App() -> Html {
     rsx! {
-      <BrowserRouter>
-           <Switch<Route> render={switch} />
-      </BrowserRouter>
+      <NextRouter>
+           <Switch render={switch} />
+      </NextRouter>
     }
 }
