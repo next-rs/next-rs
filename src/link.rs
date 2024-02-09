@@ -3,7 +3,6 @@ use crate::router::*;
 use serde_json::Value;
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
-use yew_router::AnyRoute;
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
@@ -110,12 +109,12 @@ pub struct LinkProps {
 #[func]
 pub fn Link(props: &LinkProps) -> Html {
     let props = props.clone();
-    let to: AnyRoute = AnyRoute::new(props.to);
+    let to = props.to;
     #[allow(unused_variables)]
-    let state = props.state.to_string();
+    let state = props.state;
     #[allow(unused_variables)]
     let query = props.query;
-    let navigator = use_navigator().expect("failed to get navigator");
+    let router = use_router();
 
     let (target, href) = if props.to.starts_with("/#") {
         // local anchor
@@ -134,23 +133,23 @@ pub fn Link(props: &LinkProps) -> Html {
             ("", Value::Null) => {
                 // Don't push the url twice onto the stack
                 if target != "_blank" {
-                    navigator.push(&to);
+                    router.push(to);
                 }
             }
             (state, Value::Null) => {
                 event.prevent_default();
-                navigator.push_with_state(&to, state);
+                router.push_with_state(to, state);
             }
             ("", query) => {
                 event.prevent_default();
-                navigator
-                    .push_with_query(&to, &query)
+                router
+                    .push_with_query(to, &query)
                     .expect("failed push history with query");
             }
             (state, query) => {
                 event.prevent_default();
-                navigator
-                    .push_with_query_and_state(&to, &query, state)
+                router
+                    .push_with_query_and_state(to, &query, state)
                     .expect("failed push history with query and state");
             }
         }
@@ -172,26 +171,22 @@ pub fn Link(props: &LinkProps) -> Html {
                 {
                     let offset_top = element.get_bounding_client_rect().y();
                     window()
-                        .and_then(|win| {
-                            Some(
-                                win.scroll_to_with_scroll_to_options(
-                                    &ScrollToOptions::new()
-                                        .top(offset_top)
-                                        .behavior(scroll_behavior),
-                                ),
+                        .map(|win| {
+                            win.scroll_to_with_scroll_to_options(
+                                ScrollToOptions::new()
+                                    .top(offset_top)
+                                    .behavior(scroll_behavior),
                             )
                         })
                         .expect("Failed to scroll to local anchor link");
                 } else {
                     // Fallback to prop offset if element is not found
                     window()
-                        .and_then(|win| {
-                            Some(
-                                win.scroll_to_with_scroll_to_options(
-                                    &ScrollToOptions::new()
-                                        .top(props.scroll_offset)
-                                        .behavior(scroll_behavior),
-                                ),
+                        .map(|win| {
+                            win.scroll_to_with_scroll_to_options(
+                                ScrollToOptions::new()
+                                    .top(props.scroll_offset)
+                                    .behavior(scroll_behavior),
                             )
                         })
                         .expect("Failed to scroll to fallback offset");
@@ -199,20 +194,18 @@ pub fn Link(props: &LinkProps) -> Html {
             } else {
                 // External link
                 window()
-                    .and_then(|win| {
-                        Some(
-                            win.scroll_to_with_scroll_to_options(
-                                &ScrollToOptions::new()
-                                    .top(props.scroll_offset)
-                                    .behavior(scroll_behavior),
-                            ),
+                    .map(|win| {
+                        win.scroll_to_with_scroll_to_options(
+                            ScrollToOptions::new()
+                                .top(props.scroll_offset)
+                                .behavior(scroll_behavior),
                         )
                     })
                     .expect("Failed to scroll to external link");
             }
         }
     });
-    let aria_label = "Link to ".to_string() + &href;
+    let aria_label = "Link to ".to_string() + href;
 
     let tabindex = if props.scroll { "0" } else { "-1" };
 
