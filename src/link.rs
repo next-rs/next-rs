@@ -1,6 +1,9 @@
 use crate::prelude::*;
+use crate::router::*;
+use serde_json::Value;
 use web_sys::window;
 use web_sys::{ScrollBehavior, ScrollToOptions};
+use yew_router::AnyRoute;
 
 /// Properties for the Link component.
 #[derive(Properties, Clone, PartialEq)]
@@ -20,6 +23,14 @@ pub struct LinkProps {
     /// The "rel" attribute for the link.
     #[prop_or("noreferrer")]
     pub rel: &'static str,
+
+    /// Route query data
+    #[prop_or_default]
+    pub query: Value,
+
+    /// Route state data
+    #[prop_or_default]
+    pub state: &'static str,
 
     /// The content to be displayed within the link.
     #[prop_or_default]
@@ -99,6 +110,12 @@ pub struct LinkProps {
 #[func]
 pub fn Link(props: &LinkProps) -> Html {
     let props = props.clone();
+    let to: AnyRoute = AnyRoute::new(props.to);
+    #[allow(unused_variables)]
+    let state = props.state.to_string();
+    #[allow(unused_variables)]
+    let query = props.query;
+    let navigator = use_navigator().expect("failed to get navigator");
 
     let (target, href) = if props.to.starts_with("/#") {
         // local anchor
@@ -111,6 +128,32 @@ pub fn Link(props: &LinkProps) -> Html {
         (props.target, props.to)
     };
     let onclick = Callback::from(move |event: MouseEvent| {
+        let query = query.clone();
+        // adjusted from https://docs.rs/yew-router/latest/src/yew_router/components/link.rs.html#69-86
+        match (props.state, query) {
+            ("", Value::Null) => {
+                // Don't push the url twice onto the stack
+                if target != "_blank" {
+                    navigator.push(&to);
+                }
+            }
+            (state, Value::Null) => {
+                event.prevent_default();
+                navigator.push_with_state(&to, state);
+            }
+            ("", query) => {
+                event.prevent_default();
+                navigator
+                    .push_with_query(&to, &query)
+                    .expect("failed push history with query");
+            }
+            (state, query) => {
+                event.prevent_default();
+                navigator
+                    .push_with_query_and_state(&to, &query, state)
+                    .expect("failed push history with query and state");
+            }
+        }
         if props.scroll {
             let scroll_behavior = match props.scroll_behavior {
                 "auto" => ScrollBehavior::Auto,
