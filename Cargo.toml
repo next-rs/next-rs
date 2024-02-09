@@ -16,7 +16,7 @@ categories = ["web-programming", "no-std"]
 
 [dependencies]
 gloo-net = { version = "0.5.0", features = ["http"] }
-serde_json = { version = "1.0.113", default-features = false, optional = true }
+serde_json = { version = "1.0.113", default-features = false }
 wasm-bindgen-futures = "0.4.40"
 web-sys = { version = "0.3.67", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior", "DomRect", "Element"] }
 yew = { version = "0.21.0", default-features = false, optional = true }
@@ -33,7 +33,6 @@ stylist  = { version = "0.13.0", features = ["yew_integration"], optional = true
 default = ["yew-router", "yew/csr"]
 # csr = ["yew/csr"]
 navbar = ["yew-navbar"]
-json = ["serde_json"]
 sidebar = ["yew-sidebar"]
 alert = ["yew-alert"]
 i18n = ["yew-i18n"]

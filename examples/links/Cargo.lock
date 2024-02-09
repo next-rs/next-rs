@@ -696,6 +696,7 @@ name = "next-rs-links-example"
 version = "0.1.0"
 dependencies = [
  "next-rs",
+ "serde_json",
  "yew",
  "yew-router",
 ]

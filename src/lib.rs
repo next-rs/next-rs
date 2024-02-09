@@ -79,8 +79,6 @@ pub mod image;
 pub mod link;
 
 pub use image::{Image, ImageProps};
-#[cfg(feature = "json")]
-pub use serde_json::json;
 #[cfg(feature = "input")]
 pub use input_yew::CustomInput as Input;
 pub use link::{Link, LinkProps};

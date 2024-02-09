@@ -7,7 +7,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-next-rs = { path = "../..", features = ["json"] }
+next-rs = { path = "../.." }
+serde_json = { version = "1.0.113", default-features = false }
 yew = "0.21.0"
 yew-router = "0.18.0"
 

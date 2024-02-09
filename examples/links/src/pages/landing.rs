@@ -1,5 +1,6 @@
 use next_rs::prelude::*;
-use next_rs::{Link, json};
+use next_rs::Link;
+use serde_json::json;
 
 #[func]
 pub fn LandingPage() -> Html {
