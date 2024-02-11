@@ -15,7 +15,7 @@ pub fn LandingPage() -> Html {
                     <h1 class="text-5xl font-extrabold mb-8">{"Discover Your Journey"}</h1>
                 </header>
 
-                <nav class="text-blue-400 flex items-center justify-center text-blue space-x-6 mb-12">
+                <nav class="text-blue-400 flex items-center justify-center space-x-6 mb-12">
                     <Link to="#home" class="text-lg hover:underline">{"Home"}</Link>
                     <Link to="#about" class="text-lg hover:underline">{"About"}</Link>
                     <Link to="/#features" scroll=true scroll_behavior="smooth" class="text-lg hover:underline">{"Features"}</Link>
@@ -23,6 +23,7 @@ pub fn LandingPage() -> Html {
                     <Link to="#portfolio" aria_current="page" class="text-lg hover:underline">{"Portfolio"}</Link>
                     <Link to="#services" class="text-lg hover:underline">{"Services"}</Link>
                     <Link to="#not-found" scroll_offset=300.0 scroll=true scroll_behavior="smooth" class="text-lg hover:underline">{"Not Found"}</Link>
+                    <Link to="/" target="_self" prefetch=true class="text-lg hover:underline">{"Link with Prefetch"}</Link>
                 </nav>
 
                 <section id="home" class="mb-12">

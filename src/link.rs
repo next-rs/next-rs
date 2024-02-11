@@ -39,6 +39,10 @@ pub struct LinkProps {
     #[prop_or_default]
     pub scroll: bool,
 
+    /// Enable automatic prefetch of components before clicking the link.
+    #[prop_or_default]
+    pub prefetch: bool,
+
     /// Offset for the scrolling behavior, specifying how far from the top the scroll should stop.
     #[prop_or_default]
     pub scroll_offset: f64,
@@ -115,7 +119,7 @@ pub fn Link(props: &LinkProps) -> Html {
     #[allow(unused_variables)]
     let query = props.query;
     let router = use_router();
-
+    let router_clone = router.clone();
     let (target, href) = if props.to.starts_with("/#") {
         // local anchor
         ("_self", &props.to[1..])
@@ -127,8 +131,8 @@ pub fn Link(props: &LinkProps) -> Html {
         (props.target, props.to)
     };
     let onclick = Callback::from(move |event: MouseEvent| {
+        let mut router = router.clone();
         let query = query.clone();
-        // adjusted from https://docs.rs/yew-router/latest/src/yew_router/components/link.rs.html#69-86
         match (props.state, query) {
             ("", Value::Null) => {
                 // Don't push the url twice onto the stack
@@ -203,6 +207,12 @@ pub fn Link(props: &LinkProps) -> Html {
                     })
                     .expect("Failed to scroll to external link");
             }
+        }
+    });
+    use_effect_with((), move |_| {
+        if props.prefetch {
+            let mut router = router_clone.clone();
+            router.prefetch(href);
         }
     });
     let aria_label = "Link to ".to_string() + href;
