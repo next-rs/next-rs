@@ -131,9 +131,8 @@ pub fn Link(props: &LinkProps) -> Html {
         (props.target, props.to)
     };
     let onclick = Callback::from(move |event: MouseEvent| {
-        let router = router.clone();
+        let mut router = router.clone();
         let query = query.clone();
-        // adjusted from https://docs.rs/yew-router/latest/src/yew_router/components/link.rs.html#69-86
         match (props.state, query) {
             ("", Value::Null) => {
                 // Don't push the url twice onto the stack

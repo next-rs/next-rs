@@ -246,7 +246,8 @@ impl Router {
     /// # Arguments
     ///
     /// * `route` - The route to be pushed.
-    pub fn push(&self, route: &'static str) {
+    pub fn push(&mut self, route: &'static str) {
+        self.route = route;
         self.history.push(self.prefix_basename(route));
     }
 
@@ -255,7 +256,8 @@ impl Router {
     /// # Arguments
     ///
     /// * `route` - The route to replace the current history entry.
-    pub fn replace(&self, route: &'static str) {
+    pub fn replace(&mut self, route: &'static str) {
+        self.route = route;
         self.history.replace(self.prefix_basename(route));
     }
 
@@ -265,7 +267,8 @@ impl Router {
     ///
     /// * `route` - The route to be pushed.
     /// * `state` - The state to be associated with the route.
-    pub fn push_with_state(&self, route: &'static str, state: &'static str) {
+    pub fn push_with_state(&mut self, route: &'static str, state: &'static str) {
+        self.route = route;
         self.history
             .push_with_state(self.prefix_basename(route), state);
     }
@@ -276,7 +279,8 @@ impl Router {
     ///
     /// * `route` - The route to replace the current history entry.
     /// * `state` - The state to be associated with the route.
-    pub fn replace_with_state(&self, route: &'static str, state: &'static str) {
+    pub fn replace_with_state(&mut self, route: &'static str, state: &'static str) {
+        self.route = route;
         self.history
             .replace_with_state(self.prefix_basename(route), state);
     }
@@ -291,7 +295,9 @@ impl Router {
     /// # Returns
     ///
     /// A `NavigationResult` indicating the success of the operation.
-    pub fn push_with_query(&self, route: &'static str, query: &Value) -> NavigationResult<()> {
+    pub fn push_with_query(&mut self, route: &'static str, query: &Value) -> NavigationResult<()> {
+        self.route = route;
+        self.query = query.clone();
         self.history
             .push_with_query(self.prefix_basename(route), query)
     }
@@ -308,11 +314,13 @@ impl Router {
     ///
     /// A `NavigationResult` indicating the success of the operation.
     pub fn push_with_query_and_state(
-        &self,
+        &mut self,
         route: &'static str,
         query: &Value,
         state: &'static str,
     ) -> NavigationResult<()> {
+        self.route = route;
+        self.query = query.clone();
         self.history
             .push_with_query_and_state(self.prefix_basename(route), query, state)
     }
@@ -329,11 +337,13 @@ impl Router {
     ///
     /// A `NavigationResult` indicating the success of the operation.
     pub fn replace_with_query_and_state(
-        &self,
+        &mut self,
         route: &'static str,
         query: &Value,
         state: Value,
     ) -> NavigationResult<()> {
+        self.route = route;
+        self.query = query.clone();
         self.history
             .replace_with_query_and_state(self.prefix_basename(route), query, state)
     }
@@ -419,39 +429,39 @@ impl Router {
     ///
     /// A `Result` containing `ComponentInfo` on success and an error `Value` on failure.
     async fn fetch_gloo_net(url: &str) -> Result<ComponentInfo, Value> {
-        let response = Request::get(url)
-            .cache(RequestCache::Reload)
-            .send()
-            .await
-            .unwrap();
+        let response = match Request::get(url).cache(RequestCache::Reload).send().await {
+            Ok(res) => res,
+            Err(err) => {
+                return Err(err.to_string().into());
+            }
+        };
 
-        let json_result = response.json::<serde_json::Value>().await;
+        let _json_result = match response.json::<serde_json::Value>().await {
+            Ok(data) => data,
+            Err(err) => {
+                return Err(err.to_string().into());
+            }
+        };
 
-        match json_result {
-            Ok(_data) => Ok(ComponentInfo {
-                component: rsx! {},
-                err: "",
-            }),
-            Err(err) => Err(err.to_string().into()),
-        }
+        Ok(ComponentInfo {
+            component: rsx! {},
+            err: "",
+        })
     }
-
     /// Initiates the fetching of route information for the specified route.
     ///
     /// # Arguments
     ///
     /// * `route` - The route to fetch.
     fn fetch_route(&mut self, route: String) {
-        // let url = format!("/{}/index.json", route);
-        // TODO: for demonstration purposes using an external api. Replace it with a local component json file
-        let url = "https://dog.ceo/api/breeds/image/random";
+        let url = format!("/{}/index.json", route);
         let events = EventListener::new();
         let subscriptions = self.subscriptions.clone();
         let as_path = self.as_path;
         let route = route.clone();
         let self_route = self.route;
         let fetching_routes = Callback::from(move |_: String| {
-            // let url = url.clone();
+            let url = url.clone();
             let mut fetching_routes = HashSet::new();
             let mut events = events.clone();
             let subscriptions = subscriptions.clone();
@@ -459,12 +469,11 @@ impl Router {
             let route = route.clone();
             let self_route = self_route;
             spawn_local(async move {
-                match Self::fetch_gloo_net(&url).await {
+                let result = match Self::fetch_gloo_net(&url).await {
                     Ok(component_info) => {
                         fetching_routes.insert(route.clone());
                         if self_route == route {
-                            let ComponentInfo { component: _, err } = component_info.clone();
-                            if !err.is_empty() {
+                            if !component_info.err.is_empty() {
                                 events.handle_event(&Function::new_with_args(
                                     "route_change_error",
                                     as_path,
@@ -476,9 +485,11 @@ impl Router {
                                 as_path,
                             ));
                         }
+                        Ok(())
                     }
-                    Err(_err) => {
+                    Err(fetch_error) => {
                         fetching_routes.insert(route.clone());
+                        log(&format!("Error fetching route: {:?}", fetch_error).into());
                         if self_route == route {
                             let component_info = ComponentInfo {
                                 component: rsx! {},
@@ -490,9 +501,13 @@ impl Router {
                                 as_path,
                             ));
                         }
+                        Err(fetch_error)
                     }
+                };
+
+                if let Err(error) = result {
+                    log(&format!("Failed to handle fetch result: {:?}", error).into());
                 }
-                fetching_routes.insert(route.clone());
             });
             // fetching_routes.clone()
         });
