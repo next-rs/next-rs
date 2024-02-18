@@ -75,10 +75,12 @@
 //! Special thanks to the Yew community and contributors for such an amazing framework.
 //!
 
+pub mod head;
 pub mod image;
 pub mod link;
 pub mod router;
 
+pub use head::Head;
 pub use image::{Image, ImageProps};
 #[cfg(feature = "input")]
 pub use input_yew::CustomInput as Input;

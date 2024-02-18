@@ -1,5 +1,7 @@
 use next_rs::prelude::*;
+use next_rs::Head;
 use next_rs::Link;
+
 use serde_json::json;
 
 #[func]
@@ -8,9 +10,13 @@ pub fn LandingPage() -> Html {
         "category": "rust",
         "sort": "date",
     });
+
     rsx! {
         <div class="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
             <div class="max-w-4xl mx-auto p-8 text-center">
+                <Head>
+                    <title>{"Next RS Link Component Demo"}</title>
+                </Head>
                 <header id="header">
                     <h1 class="text-5xl font-extrabold mb-8">{"Discover Your Journey"}</h1>
                 </header>
@@ -25,7 +31,6 @@ pub fn LandingPage() -> Html {
                     <Link to="#not-found" scroll_offset=300.0 scroll=true scroll_behavior="smooth" class="text-lg hover:underline">{"Not Found"}</Link>
                     <Link to="/" target="_self" prefetch=true class="text-lg hover:underline">{"Link with Prefetch"}</Link>
                 </nav>
-
                 <section id="home" class="mb-12">
                     <h2 class="text-3xl font-semibold mb-4">{"Unleash Creativity and Innovation"}</h2>
                     <div class="flex flex-col items-center justify-center bg-gray-700 p-8 rounded-md shadow-lg">
