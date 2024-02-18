@@ -690,8 +690,6 @@ dependencies = [
 [[package]]
 name = "input_yew"
 version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36a9e07b78dcb726656f5e090196ce99379c110fa20567ceda174fd0ce14da6c"
 dependencies = [
  "web-sys",
  "yew",
@@ -777,7 +775,7 @@ dependencies = [
 
 [[package]]
 name = "next-rs"
-version = "0.0.10"
+version = "0.0.11"
 dependencies = [
  "gloo-net 0.5.0",
  "input_yew",
@@ -786,7 +784,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "yew",
- "yew-accordion",
+ "yew-accordion 0.1.1",
  "yew-alert",
  "yew-i18n",
  "yew-navbar",
@@ -1350,6 +1348,13 @@ dependencies = [
 [[package]]
 name = "yew-accordion"
 version = "0.1.1"
+dependencies = [
+ "yew",
+]
+
+[[package]]
+name = "yew-accordion"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245b3f3b7fe4b82513e42f146adf9a118796ef4175a5229d7ef1d7d7a38664c9"
 dependencies = [
@@ -1359,8 +1364,6 @@ dependencies = [
 [[package]]
 name = "yew-alert"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc4e321496da4fe631ad3985b2d89e35e1cb4a9ce276bbd89f64721ee630b078"
 dependencies = [
  "gloo 0.11.0",
  "web-sys",
@@ -1370,8 +1373,6 @@ dependencies = [
 [[package]]
 name = "yew-i18n"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8000059fb6fefb120a94284ca0f7f37263ecba560ba1886396669a5c420bfa93"
 dependencies = [
  "serde_json",
  "yew",
@@ -1395,8 +1396,6 @@ dependencies = [
 [[package]]
 name = "yew-navbar"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e2f4763b926f74a104fd7bb771725aa7c425755cd1c47c255a36167524ce932"
 dependencies = [
  "yew",
 ]
@@ -1434,9 +1433,7 @@ dependencies = [
 [[package]]
 name = "yew-sidebar"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef882c5a6332905211a6b1c27ade7843c5806844d723026f32241b30b94b6ea5"
 dependencies = [
  "yew",
- "yew-accordion",
+ "yew-accordion 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
