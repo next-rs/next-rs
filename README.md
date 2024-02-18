@@ -47,7 +47,7 @@ If you want to explore different Next RS components and features, you can check 
 
 | Example | URL |
 | --- | --- |
-| Link Component | [![Netlify Status](https://api.netlify.com/api/v1/badges/0f5cbba1-4179-45c7-91e2-5540f3539a12/deploy-status)](https://next-rs-link.netlify.app) |
+| Link And Head Components | [![Netlify Status](https://api.netlify.com/api/v1/badges/0f5cbba1-4179-45c7-91e2-5540f3539a12/deploy-status)](https://next-rs-link.netlify.app) |
 | Image Component | [![Netlify Status](https://api.netlify.com/api/v1/badges/0f5cbba1-4179-45c7-91e2-5540f3539a12/deploy-status)](https://next-rs-image.netlify.app/) |
 
 
