@@ -20,12 +20,12 @@ serde_json = { version = "1.0.113", default-features = false }
 wasm-bindgen-futures = "0.4.41"
 web-sys = { version = "0.3.68", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior", "DomRect", "Element", "EventListener", "Node"] }
 yew = { version = "0.21.0", default-features = false, optional = true }
-yew-i18n = { version = "0.1.2", default-features = false, optional = true }
-yew-navbar = { version = "0.1.1", default-features = false, optional = true }
-yew-sidebar = { version = "0.1.4", default-features = false, optional = true }
-yew-accordion  = { version = "0.1.1", default-features = false, optional = true }
-yew-alert = { version = "0.1.0", default-features = false, optional = true }
-input_yew = { version = "0.1.10", default-features = false, optional = true }
+yew-i18n = { path = "./yew-i18n", version = "0.1.2", default-features = false, optional = true }
+yew-navbar = { path = "./yew-navbar", version = "0.1.1", default-features = false, optional = true }
+yew-sidebar = { path = "./yew-sidebar", version = "0.1.4", default-features = false, optional = true }
+yew-accordion  = { path = "./yew-accordion", version = "0.1.1", default-features = false, optional = true }
+yew-alert = { path = "./yew-alert", version = "0.1.0", default-features = false, optional = true }
+input_yew = {  path = "./input_yew", version = "0.1.10", default-features = false, optional = true }
 yew-router  = { version = "0.18.0", default-features = false, optional = true }
 stylist  = { version = "0.13.0", features = ["yew_integration"], optional = true }
 

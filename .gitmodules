@@ -1,0 +1,18 @@
+[submodule "yew-navbar"]
+	path = yew-navbar
+	url = https://github.com/next-rs/yew-navbar
+[submodule "yew-sidebar"]
+	path = yew-sidebar
+	url = https://github.com/next-rs/yew-sidebar
+[submodule "yew-accordion"]
+	path = yew-accordion
+	url = https://github.com/next-rs/yew-accordion
+[submodule "yew-alert"]
+	path = yew-alert
+	url = https://github.com/next-rs/yew-alert
+[submodule "yew-i18n"]
+	path = yew-i18n
+	url = https://github.com/next-rs/yew-i18n
+[submodule "input-yew"]
+	path = input-yew
+	url = https://github.com/next-rs/input-yew
