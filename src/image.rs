@@ -1,7 +1,9 @@
 use crate::prelude::*;
 use gloo_net::http::Request;
 use wasm_bindgen_futures::spawn_local;
-use web_sys::RequestCache;
+use web_sys::js_sys::Function;
+use web_sys::wasm_bindgen::JsValue;
+use web_sys::{IntersectionObserver, IntersectionObserverInit, RequestCache};
 
 /// Properties for the Image component.
 #[derive(Properties, Clone, PartialEq)]
@@ -81,6 +83,10 @@ pub struct ImageProps {
     pub unoptimized: bool,
 
     #[prop_or_default]
+    /// Image layout.
+    pub layout: &'static str,
+
+    #[prop_or_default]
     /// Reference to the DOM node.
     pub node_ref: NodeRef,
 
@@ -129,7 +135,7 @@ impl Default for ImageProps {
             sizes: "",
             quality: "",
             priority: false,
-            placeholder: "blur",
+            placeholder: "empty",
             on_loading_complete: Callback::noop(),
             object_fit: "cover",
             object_position: "center",
@@ -138,6 +144,7 @@ impl Default for ImageProps {
             blur_data_url: "",
             lazy_boundary: "100px",
             unoptimized: false,
+            layout: "responsive",
             node_ref: NodeRef::default(),
             aria_current: "",
             aria_describedby: "",
@@ -201,6 +208,65 @@ impl Default for ImageProps {
 #[func]
 pub fn Image(props: &ImageProps) -> Html {
     let props = props.clone();
+    let img_ref = props.node_ref.clone();
+
+    use_effect_with(JsValue::from(props.src), move |deps| {
+        // Define the callback function for the IntersectionObserver
+        let callback = Function::new_no_args(
+            r###"
+            {
+                let img_ref = img_ref.clone();
+                let on_loading_complete = props.on_loading_complete.clone();
+                let on_error = props.on_error.clone();
+                
+                move || {
+                    let entries: Vec<web_sys::IntersectionObserverEntry> = js_sys::try_iter(deps)
+                        .unwrap()
+                        .unwrap()
+                        .map(|v| v.unwrap().unchecked_into())
+                        .collect();
+
+                    // Check if the image is intersecting with the viewport
+                    if let Some(entry) = entries.get(0) {
+                        if entry.is_intersecting() {
+                            // Load the image when it becomes visible
+                            let img: HtmlImageElement = img_ref.cast().unwrap();
+                            img.set_src(&props.src);
+
+                            // Call the loading complete callback
+                            on_loading_complete.emit(());
+                        }
+                    }
+                }
+            }
+            "###,
+        );
+
+        // Create IntersectionObserver configuration
+        let mut options = IntersectionObserverInit::new();
+        options.threshold(deps);
+        options.root(Some(
+            &web_sys::window()
+                .and_then(|win| win.document())
+                .unwrap()
+                .body()
+                .unwrap(),
+        ));
+
+        // Create IntersectionObserver instance
+        let observer = IntersectionObserver::new_with_options(&callback, &options)
+            .expect("Failed to create IntersectionObserver");
+
+        // Observe the image element
+        if let Some(img) = img_ref.cast::<web_sys::HtmlElement>() {
+            observer.observe(&img);
+        }
+
+        // Cleanup: Disconnect the IntersectionObserver when the component unmounts
+        return move || {
+            observer.disconnect();
+        };
+    });
 
     let fetch_data = {
         Callback::from(move |_| {
@@ -213,51 +279,239 @@ pub fn Image(props: &ImageProps) -> Html {
                     .await
                 {
                     Ok(response) => {
-                        let json_result = response.json::<serde_json::Value>();
-                        match json_result.await {
-                            Ok(_data) => {
-                                loading_complete_callback.emit(());
+                        if response.status() == 200 {
+                            let json_result = response.json::<serde_json::Value>();
+                            match json_result.await {
+                                Ok(_data) => {
+                                    loading_complete_callback.emit(());
+                                }
+                                Err(_err) => {
+                                    on_error_callback.emit(format!("Image Not Found!"));
+                                }
                             }
-                            Err(err) => {
-                                on_error_callback.emit(err.to_string());
-                            }
+                        } else {
+                            let status = response.status();
+                            let body = response.text().await.unwrap_or_else(|_| {
+                                String::from("Failed to retrieve response body")
+                            });
+                            on_error_callback.emit(format!(
+                                "Failed to load image. Status: {}, Body: {:?}",
+                                status, body
+                            ));
                         }
                     }
+
                     Err(err) => {
-                        on_error_callback.emit(err.to_string());
+                        // Handle network errors
+                        on_error_callback.emit(format!("Network error: {}", err.to_string()));
                     }
                 }
             });
         })
     };
 
+    let img_style = {
+        let mut style = String::new();
+        if !props.object_fit.is_empty() {
+            style.push_str(&format!("object-fit: {};", props.object_fit));
+        }
+        if !props.object_position.is_empty() {
+            style.push_str(&format!("object-position: {};", props.object_position));
+        }
+        if !props.style.is_empty() {
+            style.push_str(props.style);
+        }
+        style
+    };
+
+    let blur_style = if props.placeholder == "blur" {
+        format!(
+            "background-size: {}; background-position: {}; filter: blur(20px); background-image: url(\"{}\")",
+            props.sizes,
+            props.object_position,
+            props.blur_data_url
+        )
+    } else {
+        String::new()
+    };
+
+    let layout = if props.layout == "fill" {
+        rsx! {
+            <span style={String::from("display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;")}>
+                <img
+                    src={props.src}
+                    alt={props.alt}
+                    width={props.width}
+                    height={props.height}
+                    style={img_style}
+                    class={props.class}
+                    loading={if props.priority { "eager" } else { "lazy" }}
+                    sizes={props.sizes}
+                    quality={props.quality}
+                    placeholder={props.placeholder}
+                    decoding={props.decoding}
+                    ref={props.node_ref}
+                    role="img"
+                    aria-label={props.alt}
+                    aria-labelledby={props.aria_labelledby}
+                    aria-describedby={props.aria_describedby}
+                    aria-hidden={props.aria_hidden}
+                    aria-current={props.aria_current}
+                    aria-expanded={props.aria_expanded}
+                    aria-live={props.aria_live}
+                    aria-pressed={props.aria_pressed}
+                    aria-controls={props.aria_controls}
+                    onerror={fetch_data}
+                    style={blur_style}
+                />
+            </span>
+        }
+    } else if !props.width.is_empty() && !props.height.is_empty() {
+        let quotient: f64 =
+            props.height.parse::<f64>().unwrap() / props.width.parse::<f64>().unwrap();
+        let padding_top: String = if quotient.is_nan() {
+            "100%".to_string()
+        } else {
+            format!("{}%", quotient * 100.0)
+        };
+
+        if props.layout == "responsive" {
+            rsx! {
+                <span style={String::from("display: block; position: relative;")}>
+                    <span style={String::from("padding-top: ") + &padding_top}>
+                        <img
+                            src={props.src}
+                            alt={props.alt}
+                            width={props.width}
+                            height={props.height}
+                            style={img_style}
+                            class={props.class}
+                            loading={if props.priority { "eager" } else { "lazy" }}
+                            sizes={props.sizes}
+                            quality={props.quality}
+                            placeholder={props.placeholder}
+                            decoding={props.decoding}
+                            ref={props.node_ref}
+                            role="img"
+                            aria-label={props.alt}
+                            aria-labelledby={props.aria_labelledby}
+                            aria-describedby={props.aria_describedby}
+                            aria-hidden={props.aria_hidden}
+                            aria-current={props.aria_current}
+                            aria-expanded={props.aria_expanded}
+                            aria-live={props.aria_live}
+                            aria-pressed={props.aria_pressed}
+                            aria-controls={props.aria_controls}
+                            onerror={fetch_data}
+                            style={blur_style}
+                        />
+                    </span>
+                </span>
+            }
+        } else if props.layout == "intrinsic" {
+            rsx! {
+                <span style={String::from("display: inline-block; position: relative; max-width: 100%;")}>
+                    <span style={String::from("max-width: 100%;")}>
+                        <img
+                            src={props.src}
+                            alt={props.alt}
+                            width={props.width}
+                            height={props.height}
+                            style={img_style}
+                            class={props.class}
+                            loading={if props.priority { "eager" } else { "lazy" }}
+                            sizes={props.sizes}
+                            quality={props.quality}
+                            placeholder={props.placeholder}
+                            decoding={props.decoding}
+                            ref={props.node_ref}
+                            role="img"
+                            aria-label={props.alt}
+                            aria-labelledby={props.aria_labelledby}
+                            aria-describedby={props.aria_describedby}
+                            aria-hidden={props.aria_hidden}
+                            aria-current={props.aria_current}
+                            aria-expanded={props.aria_expanded}
+                            aria-live={props.aria_live}
+                            aria-pressed={props.aria_pressed}
+                            aria-controls={props.aria_controls}
+                            onerror={fetch_data}
+                            style={blur_style}
+                        />
+                    </span>
+                    <img
+                        src={props.blur_data_url}
+                        style={String::from("display: none;")}
+                        alt={props.alt}
+                        aria-hidden="true"
+                    />
+                </span>
+            }
+        } else if props.layout == "fixed" {
+            rsx! {
+                <span style={String::from("display: inline-block; position: relative;")}>
+                    <img
+                        src={props.src}
+                        alt={props.alt}
+                        width={props.width}
+                        height={props.height}
+                        style={img_style}
+                        class={props.class}
+                        loading={if props.priority { "eager" } else { "lazy" }}
+                        sizes={props.sizes}
+                        quality={props.quality}
+                        placeholder={props.placeholder}
+                        decoding={props.decoding}
+                        ref={props.node_ref}
+                        role="img"
+                        aria-label={props.alt}
+                        aria-labelledby={props.aria_labelledby}
+                        aria-describedby={props.aria_describedby}
+                        aria-hidden={props.aria_hidden}
+                        aria-current={props.aria_current}
+                        aria-expanded={props.aria_expanded}
+                        aria-live={props.aria_live}
+                        aria-pressed={props.aria_pressed}
+                        aria-controls={props.aria_controls}
+                        onerror={fetch_data}
+                        style={blur_style}
+                    />
+                </span>
+            }
+        } else {
+            rsx! {}
+        }
+    } else {
+        rsx! {
+            <span style={String::from("display: block;")}>
+                <img
+                    src={props.src}
+                    alt={props.alt}
+                    style={img_style}
+                    class={props.class}
+                    loading={if props.priority { "eager" } else { "lazy" }}
+                    sizes={props.sizes}
+                    quality={props.quality}
+                    placeholder={props.placeholder}
+                    decoding={props.decoding}
+                    ref={props.node_ref}
+                    role="img"
+                    aria-label={props.alt}
+                    aria-labelledby={props.aria_labelledby}
+                    aria-describedby={props.aria_describedby}
+                    aria-hidden={props.aria_hidden}
+                    aria-current={props.aria_current}
+                    aria-expanded={props.aria_expanded}
+                    aria-live={props.aria_live}
+                    aria-pressed={props.aria_pressed}
+                    aria-controls={props.aria_controls}
+                    onerror={fetch_data}
+                    style={blur_style}
+                />
+            </span>
+        }
+    };
     rsx! {
-        <img
-            src={props.src}
-            alt={props.alt}
-            width={props.width}
-            height={props.height}
-            style={props.style}
-            class={props.class}
-            loading={if props.priority { "eager" } else { "lazy" }}
-            sizes={props.sizes}
-            quality={props.quality}
-            placeholder={props.placeholder}
-            object-fit={props.object_fit}
-            object-position={props.object_position}
-            onerror={fetch_data.clone()}
-            decoding={props.decoding}
-            ref={props.node_ref}
-            role="img"
-            aria-label={props.alt}
-            aria-labelledby={props.aria_labelledby}
-            aria-describedby={props.aria_describedby}
-            aria-hidden={props.aria_hidden}
-            aria-current={props.aria_current}
-            aria-expanded={props.aria_expanded}
-            aria-live={props.aria_live}
-            aria-pressed={props.aria_pressed}
-            aria-controls={props.aria_controls}
-        />
+            {layout}
     }
 }
