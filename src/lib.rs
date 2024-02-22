@@ -25,7 +25,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! next-rs = { version = "0.0.11", features = ["navbar", "sidebar", "css"] }
+//! next-rs = { version = "0.0.12", features = ["navbar", "sidebar", "css"] }
 //! ```
 //!
 //! ## Usage
@@ -40,7 +40,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! next-rs = { version = "0.0.11", features = ["navbar"] }
+//! next-rs = { version = "0.0.12", features = ["navbar"] }
 //! ```
 //!
 //! Then, in your Rust code:
