@@ -17,7 +17,7 @@ categories = ["web-programming", "no-std"]
 [dependencies]
 gloo-net = { version = "0.5.0", features = ["http"] }
 serde_json = { version = "1.0.113", default-features = false }
-wasm-bindgen-futures = "0.4.41"
+wasm-bindgen-futures = "0.4.42"
 web-sys = { version = "0.3.68", features = ["Request", "Window", "ScrollToOptions", "ScrollBehavior", "DomRect", "Element", "EventListener", "Node", "IntersectionObserver", "IntersectionObserverInit", "IntersectionObserverEntry", "HtmlImageElement"] }
 yew = { version = "0.21.0", default-features = false, optional = true }
 yew-i18n = { path = "./yew-i18n", version = "0.1.2", default-features = false, optional = true }
