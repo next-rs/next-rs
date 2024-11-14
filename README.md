@@ -5,6 +5,15 @@
 ![Crates.io License](https://img.shields.io/crates/l/next-rs)
 ![Rust](https://img.shields.io/badge/rust-stable-orange)
 
+> [!WARNING] Development Paused
+> The development of **Next RS** is currently on hold as our team shifts focus to [**Dioxus**](https://github.com/DioxusLabs/dioxus). For now, we highly recommend using **Dioxus**, as it will likely include many of the features originally planned for Next RS.
+>
+> However, this isn't goodbye forever! We may return to Next RS in the future if the demand and direction align. Until then, we appreciate your support and understanding.
+>
+> With love,
+> The Team ❤️
+
+
 ## 📜 Introduction
 
 Next RS is a UI framework, written 100% in Rust btw, that simplifies building user interfaces. It provides a collection of optional features, each designed to enhance different aspects of UI development. Explore the documentation to learn about the features and how to integrate them into your Next RS projects.
