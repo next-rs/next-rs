@@ -775,7 +775,7 @@ dependencies = [
 
 [[package]]
 name = "next-rs"
-version = "0.0.12"
+version = "0.0.13"
 dependencies = [
  "gloo-net 0.5.0",
  "input_yew",
